@@ -40,7 +40,9 @@ router.post("/login", async (req, res) => {
   if (!validPassword) return res.status(400).send("Invalid password");
 
   const token = jwt.sign({ _id: user._id }, "@!G94r@bt5454kk");
-  res.header("auth-token", token).send(token);
+  res
+    .header("auth-token", token)
+    .send({ message: "Login successfully", token: token });
 
   //   res.send("Logged in!");
 });
