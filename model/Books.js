@@ -19,4 +19,30 @@ const bookShcema = new mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model("Books", bookShcema);
+const rentSchema = new mongoose.Schema({
+  bookId: {
+    type: String,
+    required: true,
+  },
+  bookTitle: {
+    type: String,
+    required: true,
+  },
+  userId: {
+    type: String,
+    requiure: true,
+  },
+  rentAmount: {
+    type: Number,
+    required: true,
+  },
+  rentDate: {
+    type: Date,
+    default: Date.now,
+  },
+});
+
+const Books = mongoose.model("Books", bookShcema);
+const rentBook = mongoose.model("rentBook", rentSchema);
+
+module.exports = { rentBook: rentBook, Book: Books };
