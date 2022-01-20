@@ -2,6 +2,7 @@ const router = require("express").Router();
 const Books = require("../model/Books");
 const { Book, rentBook } = require("../model/Books");
 const { addBookValidation } = require("../validBook");
+const { calculatePrice } = require("../calculatePrice");
 const verify = require("./verifyToken");
 
 router.get("/", async (req, res) => {
@@ -15,7 +16,7 @@ router.get("/:id", async (req, res) => {
   res.json(books);
 });
 
-router.post("/add", verify, async (req, res) => {
+router.post("/add", async (req, res) => {
   const { error } = addBookValidation(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
@@ -23,10 +24,8 @@ router.post("/add", verify, async (req, res) => {
     title: req.body.title,
     desc: req.body.desc,
     amount: req.body.amount,
-    // userid: req.user._id,
   });
   try {
-    // console.log(userId);
     const savedBook = await book.save();
     res.send(savedBook);
   } catch (error) {
@@ -65,20 +64,40 @@ router.patch("/return/:id", async (req, res) => {
   const getBookId = await rentBook.findById(id);
   const books = await Book.findById(getBookId.bookId);
   const returnAmount = books.amount + getBookId.rentAmount;
-  const returnBook = {
-    status: "return",
-    returnAt: Date.now(),
-    rentAmount: 0,
-  };
-  try {
-    await Book.findByIdAndUpdate(books, { amount: returnAmount });
-    const returnABook = await rentBook.findByIdAndUpdate(id, {
-      $set: returnBook,
-    });
-    res.send(returnABook);
-    // console.log(returnAmount);
-  } catch (error) {
-    res.status(400).send(error);
+  const calDate = calculatePrice(getBookId.rentDate);
+  if (calDate > 3) {
+    try {
+      let price = 20 * (calDate - 3);
+      const returnBook = {
+        status: "return",
+        returnAt: Date.now(),
+        rentAmount: 0,
+        price: price,
+      };
+      await Book.findByIdAndUpdate(books, { amount: returnAmount });
+      const returnABook = await rentBook.findByIdAndUpdate(id, {
+        $set: returnBook,
+      });
+      res.send(returnABook);
+    } catch (error) {
+      res.status(400).send(error);
+    }
+  } else {
+    try {
+      const returnBook = {
+        status: "return",
+        returnAt: Date.now(),
+        rentAmount: 0,
+        price: 0,
+      };
+      await Book.findByIdAndUpdate(books, { amount: returnAmount });
+      await rentBook.findByIdAndUpdate(id, {
+        $set: returnBook,
+      });
+      res.send("Return book successfully");
+    } catch (error) {
+      res.status(400).send(error);
+    }
   }
 });
 

@@ -51,6 +51,9 @@ const rentSchema = new mongoose.Schema(
     returnAt: {
       type: Date,
     },
+    price: {
+      type: Number,
+    },
   },
   { versionKey: false }
 );
