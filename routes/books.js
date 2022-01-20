@@ -1,14 +1,15 @@
 const router = require("express").Router();
+const Books = require("../model/Books");
 const { Book, rentBook } = require("../model/Books");
 const { addBookValidation } = require("../validBook");
 const verify = require("./verifyToken");
 
-router.get("/", verify, async (req, res) => {
+router.get("/", async (req, res) => {
   const books = await Book.find();
   res.json(books);
 });
 
-router.get("/:id", verify, async (req, res) => {
+router.get("/:id", async (req, res) => {
   const { id } = req.params;
   const books = await Book.findById(id);
   res.json(books);
@@ -36,21 +37,48 @@ router.post("/add", verify, async (req, res) => {
 router.post("/rent/:id", verify, async (req, res) => {
   const { id } = req.params;
   const books = await Book.findById(id);
+  const deleteAmount = books.amount - req.body.rentAmount;
+  const status = "rent";
   if (books.amount > 1) {
     const rent = new rentBook({
       bookId: id,
       bookTitle: books.title,
       userId: req.user._id,
       rentAmount: req.body.rentAmount,
+      status: status,
+      rentDate: Date.now(),
     });
     try {
-      //   const rentBook = await rent.save();
-      res.send(rent);
+      await Book.findByIdAndUpdate(books, { amount: deleteAmount });
+      const rentBook = await rent.save();
+      res.send(rentBook);
     } catch (error) {
       res.status(400).send(error);
     }
   } else {
     res.status(400).send("Book is not rent");
+  }
+});
+
+router.patch("/return/:id", async (req, res) => {
+  const { id } = req.params;
+  const getBookId = await rentBook.findById(id);
+  const books = await Book.findById(getBookId.bookId);
+  const returnAmount = books.amount + getBookId.rentAmount;
+  const returnBook = {
+    status: "return",
+    returnAt: Date.now(),
+    rentAmount: 0,
+  };
+  try {
+    await Book.findByIdAndUpdate(books, { amount: returnAmount });
+    const returnABook = await rentBook.findByIdAndUpdate(id, {
+      $set: returnBook,
+    });
+    res.send(returnABook);
+    // console.log(returnAmount);
+  } catch (error) {
+    res.status(400).send(error);
   }
 });
 
