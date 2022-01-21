@@ -16,20 +16,25 @@ router.get("/:id", async (req, res) => {
   res.json(books);
 });
 
-router.post("/add", async (req, res) => {
-  const { error } = addBookValidation(req.body);
-  if (error) return res.status(400).send(error.details[0].message);
+router.post("/add", verify, async (req, res) => {
+  const isAdmin = req.user.isAdmin;
+  if (isAdmin === true) {
+    const { error } = addBookValidation(req.body);
+    if (error) return res.status(400).send(error.details[0].message);
 
-  const book = new Book({
-    title: req.body.title,
-    desc: req.body.desc,
-    amount: req.body.amount,
-  });
-  try {
-    const savedBook = await book.save();
-    res.send(savedBook);
-  } catch (error) {
-    res.status(400).send(error);
+    const book = new Book({
+      title: req.body.title,
+      desc: req.body.desc,
+      amount: req.body.amount,
+    });
+    try {
+      const savedBook = await book.save();
+      res.send(savedBook);
+    } catch (error) {
+      res.status(400).send(error);
+    }
+  } else {
+    res.status(400).send("Not Admin");
   }
 });
 
