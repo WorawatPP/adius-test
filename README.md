@@ -102,9 +102,36 @@
 * *example id = 61ea64da9a2f448dafea895f*
 * **Respone :**
     ```sh
-    {
-        Return book successfully
-    }
+    [
+        {
+            "_id": "61ea64da9a2f448dafea895f",
+            "bookId": "61ea62e89a2f448dafea895b",
+            "bookTitle": "MERN Stack Course",
+            "userId": "61e8fe239167bc9ef52d4aec",
+            "rentAmount": 0,
+            "status": "return",
+            "rentDate": "2022-01-21T07:46:34.215Z",
+            "price": 0,
+            "returnAt": "2022-01-21T07:50:57.900Z"
+        }
+    [
+    ```
+* **if returnAt - rentDate > 3 price = 20 per days**
+* **Respone :**
+    ```sh
+    [
+        {
+            "_id": "61ea78588663cc481534d39a",
+            "bookId": "61ea62e89a2f448dafea895b",
+            "bookTitle": "MERN Stack Course",
+            "userId": "61e8fe239167bc9ef52d4aec",
+            "rentAmount": 0,
+            "status": "return",
+            "rentDate": "2022-01-15T09:09:44.159Z",
+            "price": 60,
+            "returnAt": "2022-01-21T09:10:11.876Z"
+        }
+    ]
     ```
 
 
