@@ -70,6 +70,7 @@ router.patch("/return/:id", async (req, res) => {
   const books = await Book.findById(getBookId.bookId);
   const returnAmount = books.amount + getBookId.rentAmount;
   const calDate = calculatePrice(getBookId.rentDate);
+  let data = [];
   if (calDate > 3) {
     try {
       let price = 20 * (calDate - 3);
@@ -83,10 +84,11 @@ router.patch("/return/:id", async (req, res) => {
       const returnABook = await rentBook.findByIdAndUpdate(id, {
         $set: returnBook,
       });
-      res.send(returnABook);
+      data.push(returnABook);
     } catch (error) {
       res.status(400).send(error);
     }
+    res.send(data);
   } else {
     try {
       const returnBook = {
@@ -96,13 +98,14 @@ router.patch("/return/:id", async (req, res) => {
         price: 0,
       };
       await Book.findByIdAndUpdate(books, { amount: returnAmount });
-      await rentBook.findByIdAndUpdate(id, {
+      const returnABook = await rentBook.findByIdAndUpdate(id, {
         $set: returnBook,
       });
-      res.send("Return book successfully");
+      data.push(returnABook);
     } catch (error) {
       res.status(400).send(error);
     }
+    res.send(data);
   }
 });
 
