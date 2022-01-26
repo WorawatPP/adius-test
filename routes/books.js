@@ -78,13 +78,17 @@ router.patch("/return/:id", async (req, res) => {
       const returnBook = {
         status: "return",
         returnAt: Date.now(),
-        rentAmount: 0,
+        rentAmount: getBookId.rentAmount,
         price: price,
       };
       await Book.findByIdAndUpdate(books, { amount: returnAmount });
-      const returnABook = await rentBook.findByIdAndUpdate(id, {
-        $set: returnBook,
-      });
+      const returnABook = await rentBook.findByIdAndUpdate(
+        id,
+        {
+          $set: returnBook,
+        },
+        { new: true }
+      );
       data.push(returnABook);
     } catch (error) {
       res.status(400).send(error);
@@ -96,13 +100,17 @@ router.patch("/return/:id", async (req, res) => {
       const returnBook = {
         status: "return",
         returnAt: Date.now(),
-        rentAmount: 0,
+        rentAmount: getBookId.rentAmount,
         price: 0,
       };
       await Book.findByIdAndUpdate(books, { amount: returnAmount });
-      const returnABook = await rentBook.findByIdAndUpdate(id, {
-        $set: returnBook,
-      });
+      const returnABook = await rentBook.findByIdAndUpdate(
+        id,
+        {
+          $set: returnBook,
+        },
+        { new: true }
+      );
       data.push(returnABook);
     } catch (error) {
       res.status(400).send(error);
