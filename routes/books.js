@@ -43,12 +43,13 @@ router.post("/rent/:id", verify, async (req, res) => {
   const books = await Book.findById(id);
   const deleteAmount = books.amount - req.body.rentAmount;
   const status = "rent";
-  if (books.amount > 1) {
+  const rentAmount = req.body.rentAmount;
+  if (books.amount > 1 && rentAmount < books.amount) {
     const rent = new rentBook({
       bookId: id,
       bookTitle: books.title,
       userId: req.user._id,
-      rentAmount: req.body.rentAmount,
+      rentAmount: rentAmount,
       status: status,
       rentDate: Date.now(),
     });
